@@ -1,6 +1,6 @@
 //Using MongoDB module v3+
 // const MongoClient = require('mongodb').MongoClient; // The normal way
-const {MongoClient} = require('mongodb'); //The ES6 destructuring way
+const {MongoClient, ObjectID} = require('mongodb'); //The ES6 destructuring way
 
 MongoClient.connect('mongodb://localhost:27017/TodoApp', (err, client) => {
     if(err) {
