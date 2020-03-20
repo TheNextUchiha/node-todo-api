@@ -1,12 +1,13 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-
 var {ObjectID} = require('mongodb');
+
 var {mongoose} = require('./db/mongoose');
 var {Todo} = require('./models/todo');
 var {User} = require('./models/user');
 
 var app = express();
+var port = process.env.PORT || 1234;  // process.env.PORT -> For Heroku, as Heroku use Linux servers
 //Express Middleware
 app.use(bodyParser.json());
 
@@ -48,7 +49,23 @@ app.get('/todos/:id', (req, res) => {
 
 });
 
+app.delete('/todos/:id', (req, res) => {
+    var id = req.params.id;
+
+    if(!ObjectID.isValid(id)) {
+        return res.status(404).send();
+    }
+
+    Todo.findByIdAndRemove(id).then((todo) => {
+        if(!todo) {
+            return res.status(404).send();
+        }
+
+        res.send(todo);
+    }).catch((e) => res.status(404).send());
+});
+
 //App initaite
-app.listen(1234, () => {
-    console.log('Server is up at port 1234');
+app.listen(port, () => {
+    console.log(`Server is up at port ${port}`);
 });
