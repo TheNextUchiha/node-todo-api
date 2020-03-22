@@ -9,21 +9,11 @@ var {User} = require('./models/user');
 
 var app = express();
 var port = process.env.PORT || 1234;  // process.env.PORT -> For Heroku, as Heroku use Linux servers
-//Express Middleware
+// Express Middleware
 app.use(bodyParser.json());
 
-//Express routes handlers
-app.post('/todos', (req, res) => {
-    var todo = new Todo({
-        text: req.body.text
-    });
-
-    todo.save().then((doc) => {
-        res.send(doc);
-    }, (e) => {
-        res.status(400).send(e);
-    });
-});
+// Express routes handlers
+// GET routes
 
 app.get('/todos', (req, res) => {
     Todo.find().then((todos) => {
@@ -50,6 +40,32 @@ app.get('/todos/:id', (req, res) => {
 
 });
 
+// POST routes
+app.post('/todos', (req, res) => {
+    var todo = new Todo({
+        text: req.body.text
+    });
+
+    todo.save().then((doc) => {
+        res.send(doc);
+    }, (e) => {
+        res.status(400).send(e);
+    });
+});
+app.post('/users', (req, res) => {
+    var body = _.pick(req.body, ['email', 'password']);
+    var user = new User(body);
+
+    user.save().then(() => {
+        return user.generateAuthToken();
+    }).then((token) => {
+        res.header('x-auth', token).send(user);
+    }).catch((e) => {
+        res.status(400).send(e);
+    });
+});
+
+// DELETE routes
 app.delete('/todos/:id', (req, res) => {
     var id = req.params.id;
 
@@ -66,6 +82,7 @@ app.delete('/todos/:id', (req, res) => {
     }).catch((e) => res.status(404).send());
 });
 
+// PATCH routes
 app.patch('/todos/:id', (req, res) => {
     var id = req.params.id;
     var body = _.pick(req.body, ['text', 'completed']);
@@ -91,8 +108,7 @@ app.patch('/todos/:id', (req, res) => {
 
 });
 
-
-//App initaite
+// App initaite
 app.listen(port, () => {
     console.log(`Server is up at port ${port}`);
 });
