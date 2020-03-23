@@ -6,9 +6,11 @@ const {ObjectID} = require('mongodb');
 var {mongoose} = require('./db/mongoose');
 var {Todo} = require('./models/todo');
 var {User} = require('./models/user');
+var {authenticate} = require('./middleware/authenticate');
 
 var app = express();
 var port = process.env.PORT || 1234;  // process.env.PORT -> For Heroku, as Heroku use Linux servers
+
 // Express Middleware
 app.use(bodyParser.json());
 
@@ -38,6 +40,10 @@ app.get('/todos/:id', (req, res) => {
         res.send({todo});
     }).catch((e) => res.status(404).send());
 
+});
+
+app.get('/users/me', authenticate, (req, res) => {
+    res.send(req.user);
 });
 
 // POST routes
