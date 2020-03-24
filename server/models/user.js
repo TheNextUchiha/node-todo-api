@@ -33,6 +33,8 @@ var UserSchema = new mongoose.Schema({
     }]
 });
 
+// UserSchema methods are used to apply methods on an instance of a User object.
+
 UserSchema.methods.toJSON = function() {
     var user = this;
     var userObject = user.toObject();
@@ -51,6 +53,18 @@ UserSchema.methods.generateAuthToken = function() {
         return token;
     });
 };
+
+UserSchema.methods.removeToken = function(token) {
+    var user = this;
+    
+    return user.updateOne({
+        $pull: {
+            tokens: {token}
+        }
+    });
+};
+
+// UserSchema statics is used to apply a method on the entire User Class/Schema
 
 UserSchema.statics.findByCredentials = function(email, password) {
     var User = this;
